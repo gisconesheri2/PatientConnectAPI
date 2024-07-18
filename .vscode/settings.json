@@ -1,0 +1,5 @@
+{
+    "markdown.validate.ignoredLinks": [
+        "'https://api.patientconnect.tech/docs'"
+    ]
+}

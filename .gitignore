@@ -1,0 +1,12 @@
+.env
+.venv/
+env/
+clean_facilites.txt
+file_hospital.json
+file.json
+run.py
+setup_facilities.py
+test.py
+clean_ppb_json.py
+__pycache__/
+

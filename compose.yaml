@@ -1,0 +1,52 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    expose:  # new
+      - 80
+    depends_on:
+      - mongodb
+    labels:  # new
+      - "traefik.enable=true"
+      - "traefik.http.routers.fastapi.rule=Host(`api.patientconnect.tech`)"
+      - "traefik.http.routers.fastapi.tls=true"
+      - "traefik.http.routers.fastapi.tls.certresolver=letsencrypt"
+  mongodb:
+    image: mongo:latest
+    restart: always
+    ports:
+      - '27017:27017'
+    env_file: '.env'
+    volumes:
+      - "./mongo_data:/data/db"
+      - "$PWD/mongo-entrypoint/:/docker-entrypoint-initdb.d/"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+    command: mongod
+  traefik:  # new
+    build:
+      context: .
+      dockerfile: Dockerfile.traefik
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./traefik-public-certificates:/certificates"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`dashboard-api.patientconnect.tech`) && (PathPrefix(`/`)"
+      - "traefik.http.routers.dashboard.tls=true"
+      - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.middlewares=auth"
+      - "traefik.tls.stores.default.defaultgeneratedcert.resolver: letsencrypt"
+      - "traefik.tls.stores.default.defaultgeneratedcert.domain.main: api.patientconnect.tech"
+      - "traefik.tls.stores.default.defaultgeneratedcert.domain.sans: *api.patientcoonnect.tech*"
+      - "traefik.http.middlewares.auth.basicauth.users=testuser:$$apr1$$jIKW.bdS$$eKXe4Lxjgy/rH65wP1iQe1"
+
+volumes:
+  mongo_data:
+  traefik-public-certificates:
