@@ -67,7 +67,7 @@ There are two formats to search for patients depending on age.
 
 ### Pediatric Patients
 
-For pediatric patients, you have to include the parent's ID number and name in the query object and set the is_child property to true.
+For pediatric patients, you have to include the parent's ID number and name in the query object and set the _is_child_ property to true.
 For example:
 
 ```python
@@ -112,7 +112,7 @@ patient_visits = requests.post('<https://api.patientconnect.tech/patients/search
 visit_list = patient_visits.json()['visits']
 ```
 
-The returned visits object is similar in both cases. More info on this object can be found in the [docs]('https://api.patientconnect.tech/docs')
+The returned visits object is similar in both cases. More info on this object can be found in the [docs](https://api.patientconnect.tech/docs)
 
 ## POST PATIENT VISIT
 
@@ -187,7 +187,7 @@ child_visit = {
 patient_visits = requests.post('<https://api.patientconnect.tech/patients/visit>', headers=headers, json=child_patient)
 ```
 
-More info on the data needed to post a visit can be found in the [docs]('https://api.patientconnect.tech/docs')
+More info on the data needed to post a visit can be found in the [docs](https://api.patientconnect.tech/docs)
 
 ## FUTURE CONSIDERATIONS
 
