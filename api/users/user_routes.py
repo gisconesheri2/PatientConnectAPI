@@ -70,6 +70,7 @@ async def register_user(user: UserRegistration = Body(...)):
     data['password'] = hash_pd.decode('utf-8')
     data['facility_type'] = facility['facility_type']
     user = await users_collection.insert_one(data)
+    print('new user created')
     return {'status': 'user_created'}
     
 
@@ -110,4 +111,5 @@ async def login_user(form_data: Annotated[OAuth2PasswordRequestForm, Depends()])
     )
 
     access_token = create_access_token(data={'sub': user['email']})
+    print('user logged in')
     return Token(access_token=access_token, token_type="bearer")                       

@@ -26,8 +26,6 @@ class VisitSearch(BaseModel):
     @field_validator('parent_name')
     @classmethod
     def get_parent_name(cls, parent_name, values):
-        print(values.data)
-        print(parent_name)
         if values.data['is_child'] is True and (parent_name is None or parent_name == 'null'):
             raise ValueError('Must supply a parent name for a child')
         return parent_name

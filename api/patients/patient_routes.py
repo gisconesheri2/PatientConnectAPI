@@ -20,7 +20,7 @@ patients_collection = db[os.environ.get("PATIENT_COLLECTION")]
 from ..dependencies.authenticate import get_current_active_user
 
 @patient_router.post('/patients/search',
-    summary="Get a patient's previous visits",
+    summary="Search for a patient's previous visits",
     response_model=VisitResponse)
 async def get_patient(
         current_user: Annotated[User, Depends(get_current_active_user)],
@@ -95,21 +95,26 @@ async def get_patient(
                     for visit in child['visits']:
                         if visit['facility_name'] != current_user.facility_name:
                             other_facility_visits.append(visit)
+                    print('visits for a child retrived')
                     return {'visits': other_facility_visits}
     else:
         patient_db = await patients_collection.find_one(
             filter={'id_number': patient.id_number},
             projection={'visits': 1, '_id': 0})
         other_facility_visits = []
-        for visit in patient_db['visits']:
-            if visit['facility_name'] != current_user.facility_name:
-                other_facility_visits.append(visit)
-        return {'visits': other_facility_visits}
+        if patient_db is not None:
+            for visit in patient_db['visits']:
+                if visit['facility_name'] != current_user.facility_name:
+                    other_facility_visits.append(visit)
+            print('visits for an adult retrieved')
+            return {'visits': other_facility_visits}
+    print('visits for a non existent patient')
     return {'visits': []}
 
 
 @patient_router.post('/patients/visit',
-    summary="Search for a patient's visits")
+    summary="Post a patient's current visit",
+    status_code=201)
 async def add_visit(
         current_user: Annotated[User, Depends(get_current_active_user)],
         visit: VisitUpload = Body(...),):
@@ -231,7 +236,6 @@ async def add_visit(
                         update_child = True
                         break
         # if parent exists and child is new, add a new child
-        print(update_child)
         if not update_child:
             child =  Child(name=patient.name,
                            visits=[visit_details])
@@ -258,4 +262,4 @@ async def add_visit(
                 update={ '$push': {
                                 'visits': visit_details.model_dump()}})
             print("updated old parent without children")
-    return {'status': 'Visit posted successfully'}, 201
+    return {'status': 'Visit posted successfully'}
